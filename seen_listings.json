@@ -1,14 +1,134 @@
-[
-  "0941-4A",
-  "0993-4A",
-  "18B (2023 retro)",
-  "3427NS",
-  "4909",
-  "6548M",
-  "7061",
-  "8607",
-  "8933S",
-  "9025S",
-  "9528S",
-  "9907"
-]
+{
+  "0941-4A": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "12500",
+    "status": "draft",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "22",
+    "year": "2017"
+  },
+  "0993-4A": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "32599",
+    "status": "sold",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "22",
+    "year": "2017"
+  },
+  "18B (2023 retro)": {
+    "family": "vision",
+    "kind": "Retrofit",
+    "listed_at": "2026-08-20 21:28:43 UTC",
+    "note": "This is a 2004-2008 machine with a 2023 Vision 2.0 Retrofit installed.  Since these electronics are 3 years old, the price is reduced. it's listed on BOTH side (retrofit and non-retrofit) right now.",
+    "price": "11499",
+    "status": "active",
+    "table": "10\u2032 or 12\u2032 (your choice) HomePro (HP non-Breeze)",
+    "throat": "18",
+    "year": ""
+  },
+  "3427NS": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": "2026-08-20 21:28:43 UTC",
+    "note": "",
+    "price": "11999",
+    "status": "active",
+    "table": "10\u2032 (only) HomePro (HP2 Breeze)",
+    "throat": "18",
+    "year": "2021"
+  },
+  "4909": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "Can be upgraded to Ascend prior to delivery for $6000",
+    "price": "35399",
+    "status": "sold",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "30",
+    "year": "2009"
+  },
+  "6548M": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": "2026-08-20 21:28:43 UTC",
+    "note": "Can be upgraded to Ascend prior to delivery for $6000",
+    "price": "42899",
+    "status": "active",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "30",
+    "year": "2018"
+  },
+  "7061": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": "2026-08-20 21:28:43 UTC",
+    "note": "Computerized upgrades available",
+    "price": "25499",
+    "status": "active",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "30",
+    "year": "2021"
+  },
+  "8607": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": "2026-08-20 21:28:43 UTC",
+    "note": "Can be upgraded to Ascend prior to delivery for $6000",
+    "price": "35599",
+    "status": "active",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "26",
+    "year": "2012"
+  },
+  "8933S": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "17449",
+    "status": "sold",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "26",
+    "year": "2017"
+  },
+  "9025S": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "Computerized upgrades available",
+    "price": "17999",
+    "status": "sold",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "26",
+    "year": "2018"
+  },
+  "9528S": {
+    "family": "ascend",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "51399",
+    "status": "sold",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "26",
+    "year": "2023"
+  },
+  "9907": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": "2026-08-20 21:28:43 UTC",
+    "note": "2019 Statler retrofit on 2017 machine. Can be upgraded to Ascend prior to delivery for $6000",
+    "price": "40749",
+    "status": "active",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "26",
+    "year": "2017"
+  }
+}
