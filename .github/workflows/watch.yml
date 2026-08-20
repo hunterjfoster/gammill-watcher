@@ -36,10 +36,11 @@ jobs:
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
         run: python watch_gammill.py
 
-      - name: Save updated seen-listings state
+      - name: Save updated tracking files
         run: |
           git config user.name "gammill-watcher-bot"
           git config user.email "actions@github.com"
-          git add seen_listings.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update seen listings"
+          git add seen_listings.json daily_summary.json listing_log.csv
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update listing tracking"
+          git pull --rebase
           git push
