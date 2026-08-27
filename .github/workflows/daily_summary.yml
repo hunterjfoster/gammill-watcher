@@ -2,11 +2,11 @@ name: Gammill Daily Summary
 
 on:
   schedule:
-    # 03:00 UTC = 10:00 PM Central Daylight Time (summer) / 9:00 PM Central
-    # Standard Time (winter). GitHub cron doesn't handle DST, so this will
-    # drift by an hour depending on time of year - adjust the number below
-    # if you want it pinned to an exact local time year-round.
-    - cron: "0 3 * * *"
+    # 03:07 UTC = ~10:07 PM Central (adjusts with DST). Deliberately an odd,
+    # non-round minute - scheduling at :00 (or other common minutes like :15/
+    # :30) puts this in GitHub's busier queue slots, which can delay or
+    # occasionally skip runs. An off-beat minute like :07 avoids most of that.
+    - cron: "7 3 * * *"
   workflow_dispatch:
     # Lets you manually trigger a run from the Actions tab, e.g. to test.
 
