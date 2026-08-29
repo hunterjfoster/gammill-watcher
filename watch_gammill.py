@@ -57,10 +57,21 @@ LOG_HEADERS = [
 # Fetching
 # ---------------------------------------------------------------------------
 
-def fetch_listings():
+def fetch_listings(max_retries=3, timeout=45):
     """Pull the CSV feed and return a list of row dicts, keyed by column name."""
-    resp = requests.get(CSV_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-    resp.raise_for_status()
+    last_error = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.get(CSV_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=timeout)
+            resp.raise_for_status()
+            break
+        except requests.exceptions.RequestException as e:
+            last_error = e
+            print(f"Attempt {attempt}/{max_retries} failed: {e}")
+            if attempt < max_retries:
+                time.sleep(5 * attempt)
+    else:
+        raise last_error
 
     reader = csv.DictReader(io.StringIO(resp.text))
     listings = []
