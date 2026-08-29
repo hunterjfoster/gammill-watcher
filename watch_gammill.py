@@ -24,6 +24,7 @@ import csv
 import io
 import json
 import os
+import time
 import smtplib
 from datetime import datetime, timezone
 from email.mime.text import MIMEText
