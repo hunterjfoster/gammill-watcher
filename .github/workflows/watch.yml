@@ -2,11 +2,11 @@ name: Gammill Watcher
 
 on:
   schedule:
-    # Runs every 5 minutes so you're notified as close to real-time as
+    # Runs every 13 minutes so you're notified as close to real-time as
     # possible. GitHub's schedule times can occasionally run a few minutes
     # late during high platform load - that's normal and not something to
     # worry about.
-    - cron: "*/5 * * * *"
+    - cron: "*/13 * * * *"
   workflow_dispatch:
     # Lets you manually trigger a run from the Actions tab, e.g. to test.
 
