@@ -7,9 +7,10 @@ Google Sheet, fetched as CSV) and:
 
   1. Emails you a digest of any NEW active listings since the last check -
      pre-loved or retrofit, any model, any size.
-  2. Logs every "Listed" and "Sold" event, with a timestamp, to
-     listing_log.csv - open that file any time in Excel/Google Sheets for
-     a full history of what's come and gone.
+  2. Logs every "Listed", "Sold", and "Removed" event, each with its own
+     timestamp, to listing_log.csv - open that file any time in Excel/Google
+     Sheets for a full history of what's come, been marked sold, and later
+     disappeared from the feed entirely.
 
 Designed to run on a schedule via GitHub Actions (see .github/workflows/watch.yml)
 so it works even when your computer is off.
@@ -24,7 +25,6 @@ import csv
 import io
 import json
 import os
-import time
 import smtplib
 from datetime import datetime, timezone
 from email.mime.text import MIMEText
@@ -58,21 +58,10 @@ LOG_HEADERS = [
 # Fetching
 # ---------------------------------------------------------------------------
 
-def fetch_listings(max_retries=3, timeout=45):
+def fetch_listings():
     """Pull the CSV feed and return a list of row dicts, keyed by column name."""
-    last_error = None
-    for attempt in range(1, max_retries + 1):
-        try:
-            resp = requests.get(CSV_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=timeout)
-            resp.raise_for_status()
-            break
-        except requests.exceptions.RequestException as e:
-            last_error = e
-            print(f"Attempt {attempt}/{max_retries} failed: {e}")
-            if attempt < max_retries:
-                time.sleep(5 * attempt)
-    else:
-        raise last_error
+    resp = requests.get(CSV_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+    resp.raise_for_status()
 
     reader = csv.DictReader(io.StringIO(resp.text))
     listings = []
@@ -104,16 +93,22 @@ def snapshot(listing):
 
 
 # ---------------------------------------------------------------------------
-# State tracking (status per listing id, so we can detect Listed -> Sold)
+# State tracking (status per listing id, so we can detect Listed -> Sold -> Removed)
 # ---------------------------------------------------------------------------
+#
+# Each listing's status moves through: active -> sold -> removed (any step
+# can be skipped - e.g. a listing can vanish from the feed without ever
+# being marked "sold" first). Re-listing (removed/sold -> active again) is
+# also handled, logged as a fresh "Listed".
 
 def load_state():
     if not SEEN_FILE.exists():
         return {}
     raw = json.loads(SEEN_FILE.read_text())
     if isinstance(raw, list):
-        # Migrate from the old flat-list format
-        return {listing_id: {"status": "unknown", "listed_at": None} for listing_id in raw}
+        # Migrate from the very old flat-list format (pre-dates status tracking)
+        return {listing_id: {"status": "unknown", "listed_at": None,
+                              "sold_at": None, "removed_at": None} for listing_id in raw}
     return raw
 
 
@@ -220,29 +215,45 @@ def main():
             if status == "active":
                 new_active_listings.append(listing)
                 log_rows.append(make_log_row(now, "Listed", lid, info))
-                state[lid] = {"status": "active", "listed_at": now, **info}
+                state[lid] = {"status": "active", "listed_at": now,
+                              "sold_at": None, "removed_at": None, **info}
+            elif status == "sold":
+                # Already sold the very first time we ever saw it - we have
+                # no idea when it was actually listed, so this is flagged
+                # distinctly rather than silently absorbed.
+                log_rows.append(make_log_row(
+                    now, "Sold (already sold when first tracked)", lid, info))
+                state[lid] = {"status": "sold", "listed_at": None,
+                              "sold_at": now, "removed_at": None, **info}
             else:
-                state[lid] = {"status": status or "unknown", "listed_at": None, **info}
+                state[lid] = {"status": status or "unknown", "listed_at": None,
+                              "sold_at": None, "removed_at": None, **info}
             continue
 
         old_status = state[lid].get("status")
         if status != old_status:
-            if status == "sold" and old_status == "active":
+            if status == "sold" and old_status in ("active", "unknown"):
                 log_rows.append(make_log_row(now, "Sold", lid, info))
-            elif status == "active" and old_status in ("sold", "unknown"):
-                # Re-listed
+                state[lid]["sold_at"] = now
+            elif status == "active" and old_status in ("sold", "removed", "unknown"):
+                # (Re-)listed
                 new_active_listings.append(listing)
                 log_rows.append(make_log_row(now, "Listed", lid, info))
                 state[lid]["listed_at"] = now
+                state[lid]["sold_at"] = None
+                state[lid]["removed_at"] = None
         state[lid]["status"] = status or old_status
         state[lid].update(info)
 
-    # If something we had marked active has vanished from the feed entirely
-    # (removed rather than flagged "sold"), treat that as sold too.
+    # Anything we were tracking as active or sold that's now vanished from
+    # the feed entirely gets its own distinct "Removed" event - separate
+    # from "Sold", since a listing can be pulled with or without ever being
+    # marked sold first, and the two dates are worth knowing separately.
     for lid, info in state.items():
-        if info.get("status") == "active" and lid not in current_ids:
-            log_rows.append(make_log_row(now, "Sold (removed from feed)", lid, info))
-            info["status"] = "sold"
+        if info.get("status") in ("active", "sold") and lid not in current_ids:
+            log_rows.append(make_log_row(now, "Removed", lid, info))
+            info["status"] = "removed"
+            info["removed_at"] = now
 
     if log_rows:
         append_log_rows(log_rows)
@@ -260,3 +271,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
