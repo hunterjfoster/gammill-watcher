@@ -1,4 +1,17 @@
 {
+  "0890-4A": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "Available after pick up from Bonner (from machine list sheet).",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "22",
+    "year": "2018"
+  },
   "0941-4A": {
     "family": "vision",
     "kind": "Pre-Loved",
@@ -21,6 +34,19 @@
     "throat": "22",
     "year": "2017"
   },
+  "1182-4A": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "22",
+    "year": "2022"
+  },
   "18B (2023 retro)": {
     "family": "vision",
     "kind": "Retrofit",
@@ -31,6 +57,58 @@
     "table": "10\u2032 or 12\u2032 (your choice) HomePro (HP non-Breeze)",
     "throat": "18",
     "year": ""
+  },
+  "2133M": {
+    "family": "statler",
+    "kind": "Retrofit",
+    "listed_at": null,
+    "note": "2012 retrofit on a 2003 machine (from machine list sheet).",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "30",
+    "year": "2003"
+  },
+  "3209NS": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "18",
+    "year": "2018"
+  },
+  "3226NS": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "ID may be 3227NS - find the machine physically and double check (from machine list sheet).",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "18",
+    "year": "2015"
+  },
+  "3395NS": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "18",
+    "year": "2019"
   },
   "3427NS": {
     "family": "vision",
@@ -53,6 +131,32 @@
     "table": "12\u2032 Sit or Stand",
     "throat": "30",
     "year": "2009"
+  },
+  "6009M": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "30",
+    "year": "2013"
+  },
+  "6398M": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "30",
+    "year": "2016"
   },
   "6548M": {
     "family": "statler",
@@ -87,6 +191,19 @@
     "throat": "26",
     "year": "2012"
   },
+  "8924S": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "12\u2032 Sit or Stand",
+    "throat": "26",
+    "year": "2017"
+  },
   "8933S": {
     "family": "vision",
     "kind": "Pre-Loved",
@@ -95,6 +212,19 @@
     "price": "17450",
     "status": "draft",
     "table": "12\u2032 Sit or Stand",
+    "throat": "26",
+    "year": "2017"
+  },
+  "8951S": {
+    "family": "vision",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
     "throat": "26",
     "year": "2017"
   },
@@ -119,6 +249,19 @@
     "table": "12\u2032 Sit or Stand",
     "throat": "26",
     "year": "2023"
+  },
+  "9586S": {
+    "family": "statler",
+    "kind": "Pre-Loved",
+    "listed_at": null,
+    "note": "Head only - needs new everything else (from machine list sheet).",
+    "price": "",
+    "removed_at": null,
+    "sold_at": null,
+    "status": "draft",
+    "table": "",
+    "throat": "26",
+    "year": "2025"
   },
   "9907": {
     "family": "statler",
