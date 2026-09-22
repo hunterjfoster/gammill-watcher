@@ -8,7 +8,7 @@
     "removed_at": null,
     "sold_at": null,
     "status": "draft",
-    "table": "",
+    "table": "12\u2032 Sit or Stand (ask about 14')",
     "throat": "22",
     "year": "2018"
   },
@@ -43,7 +43,7 @@
     "removed_at": null,
     "sold_at": null,
     "status": "draft",
-    "table": "",
+    "table": "12\u2032 Sit or Stand (ask about 14')",
     "throat": "22",
     "year": "2022"
   },
@@ -88,12 +88,12 @@
     "family": "vision",
     "kind": "Pre-Loved",
     "listed_at": null,
-    "note": "ID may be 3227NS - find the machine physically and double check (from machine list sheet).",
+    "note": "ID may be 3227NS - find the machine physically and double check (from machine list sheet).  Is this machine BREEZE or Original Track?",
     "price": "8249",
     "removed_at": null,
     "sold_at": null,
     "status": "draft",
-    "table": "10\u2032 or 12\u2032 (your choice) HomePro",
+    "table": "",
     "throat": "18",
     "year": "2015"
   },
@@ -154,7 +154,7 @@
     "removed_at": null,
     "sold_at": null,
     "status": "draft",
-    "table": "",
+    "table": "12\u2032 Sit or Stand (ask about 14')",
     "throat": "30",
     "year": "2016"
   },
@@ -224,7 +224,7 @@
     "removed_at": null,
     "sold_at": null,
     "status": "draft",
-    "table": "",
+    "table": "12\u2032 Sit or Stand (ask about 14')",
     "throat": "26",
     "year": "2017"
   },
