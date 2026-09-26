@@ -11,3 +11,8 @@ timestamp_utc,event,id,kind,family,year,throat,table,price,note
 2026-09-15 02:33:00 UTC,Sold (already sold when first tracked),9528S,Pre-Loved,ascend,2023,26,12′ Sit or Stand,51399,
 2026-09-15 02:33:00 UTC,Sold (already sold when first tracked),0993-4A,Pre-Loved,statler,2017,22,12′ Sit or Stand,32599,
 2026-09-23 18:15:13 UTC,Sold,2133M,Retrofit,statler,2012,30,12′ Sit or Stand (ask about 14'),22499,2012 retrofit on a 2003 machine (from machine list sheet).
+2026-09-26 19:36:14 UTC,Listed,22-A,Retrofit,statler,2010–2012,22,12′ Sit or Stand,37999,Can be upgraded to Ascend prior to delivery for $7000
+2026-09-26 19:36:14 UTC,Listed,26-B,Retrofit,statler,2001–2006,26,12′ Pivotal Access,36999,Can be upgraded to Ascend prior to delivery for $7000
+2026-09-26 19:36:14 UTC,Listed,30-B,Retrofit,statler,2001–2006,30,12′ Pivotal Access,41999,Can be upgraded to Ascend prior to delivery for $7000
+2026-09-26 19:36:14 UTC,Listed,22-A-asc,Retrofit,ascend,2010–2012,22,12′ Sit or Stand,43999,
+2026-09-26 19:36:14 UTC,Listed,26-B-asc,Retrofit,ascend,2001–2006,26,12′ Sit or Stand,42999,
