@@ -58,8 +58,8 @@ DAILY_FILE = Path(__file__).parent / "daily_summary.json"
 LOG_FILE = Path(__file__).parent / "listing_log.csv"
 
 LOG_HEADERS = [
-    "timestamp_utc", "event", "id", "kind", "family",
-    "year", "throat", "table", "price", "note",
+    "event", "date", "time", "type", "year", "model",
+    "throat_depth", "table_length", "price", "notes", "id",
 ]
 
 # ---------------------------------------------------------------------------
@@ -159,17 +159,21 @@ def append_log_rows(rows):
 
 
 def make_log_row(timestamp, event, listing_id, info):
+    date_part, time_part = timestamp.split(" ", 1)
+    throat = info.get("throat", "")
+    price = info.get("price", "")
     return {
-        "timestamp_utc": timestamp,
         "event": event,
-        "id": listing_id,
-        "kind": info.get("kind", "?"),
-        "family": info.get("family", "?"),
+        "date": date_part,
+        "time": time_part,
+        "type": info.get("kind", "?"),
         "year": info.get("year", "?"),
-        "throat": info.get("throat", "?"),
-        "table": info.get("table", "?"),
-        "price": info.get("price", "?"),
-        "note": info.get("note", ""),
+        "model": (info.get("family") or "?").title(),
+        "throat_depth": f'{throat}"' if throat else "",
+        "table_length": info.get("table", "?"),
+        "price": f"${price}" if price else "",
+        "notes": info.get("note", ""),
+        "id": listing_id,
     }
 
 
@@ -193,10 +197,13 @@ def format_listing(listing):
 
 
 def send_digest(new_listings):
+    # Pre-loved machines listed first, retrofit configurations after
+    ordered = sorted(new_listings, key=lambda l: is_retrofit(l))
+
     subject = f"Gammill: {len(new_listings)} new listing(s)"
     body = (
         "New listing(s) found on the Gammill Pre-Loved / Retrofit feed:\n\n"
-        + "\n\n".join(format_listing(l) for l in new_listings)
+        + "\n\n".join(format_listing(l) for l in ordered)
         + "\n\nFull page: https://gammill.com/preloved/"
     )
 
