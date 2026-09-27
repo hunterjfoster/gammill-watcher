@@ -1,18 +1,304 @@
-timestamp_utc,event,id,kind,family,year,throat,table,price,note
-2026-08-20 21:28:43 UTC,Listed,3427NS,Pre-Loved,vision,2021,18,10′ (only) HomePro (HP2 Breeze),11999,
-2026-08-20 21:28:43 UTC,Listed,7061,Pre-Loved,vision,2021,30,12′ Sit or Stand,25499,Computerized upgrades available
-2026-08-20 21:28:43 UTC,Listed,8607,Pre-Loved,statler,2012,26,12′ Sit or Stand,35599,Can be upgraded to Ascend prior to delivery for $6000
-2026-08-20 21:28:43 UTC,Listed,9907,Pre-Loved,statler,2017,26,12′ Sit or Stand,40749,2019 Statler retrofit on 2017 machine. Can be upgraded to Ascend prior to delivery for $6000
-2026-08-20 21:28:43 UTC,Listed,6548M,Pre-Loved,statler,2018,30,12′ Sit or Stand,42899,Can be upgraded to Ascend prior to delivery for $6000
-2026-08-20 21:28:43 UTC,Listed,18B (2023 retro),Retrofit,vision,,18,10′ or 12′ (your choice) HomePro (HP non-Breeze),11499,"This is a 2004-2008 machine with a 2023 Vision 2.0 Retrofit installed.  Since these electronics are 3 years old, the price is reduced. it's listed on BOTH side (retrofit and non-retrofit) right now."
-2026-09-15 02:33:00 UTC,Sold (already sold when first tracked),0941-4A,Pre-Loved,vision,2017,22,12′ Sit or Stand,12500,
-2026-09-15 02:33:00 UTC,Sold (already sold when first tracked),4909,Pre-Loved,statler,2009,30,12′ Sit or Stand,35399,Can be upgraded to Ascend prior to delivery for $6000
-2026-09-15 02:33:00 UTC,Sold (already sold when first tracked),8933S,Pre-Loved,vision,2017,26,12′ Sit or Stand,17450,Computerized upgrades available
-2026-09-15 02:33:00 UTC,Sold (already sold when first tracked),9528S,Pre-Loved,ascend,2023,26,12′ Sit or Stand,51399,
-2026-09-15 02:33:00 UTC,Sold (already sold when first tracked),0993-4A,Pre-Loved,statler,2017,22,12′ Sit or Stand,32599,
-2026-09-23 18:15:13 UTC,Sold,2133M,Retrofit,statler,2012,30,12′ Sit or Stand (ask about 14'),22499,2012 retrofit on a 2003 machine (from machine list sheet).
-2026-09-26 19:36:14 UTC,Listed,22-A,Retrofit,statler,2010–2012,22,12′ Sit or Stand,37999,Can be upgraded to Ascend prior to delivery for $7000
-2026-09-26 19:36:14 UTC,Listed,26-B,Retrofit,statler,2001–2006,26,12′ Pivotal Access,36999,Can be upgraded to Ascend prior to delivery for $7000
-2026-09-26 19:36:14 UTC,Listed,30-B,Retrofit,statler,2001–2006,30,12′ Pivotal Access,41999,Can be upgraded to Ascend prior to delivery for $7000
-2026-09-26 19:36:14 UTC,Listed,22-A-asc,Retrofit,ascend,2010–2012,22,12′ Sit or Stand,43999,
-2026-09-26 19:36:14 UTC,Listed,26-B-asc,Retrofit,ascend,2001–2006,26,12′ Sit or Stand,42999,
+#!/usr/bin/env python3
+"""
+Gammill Pre-Loved / Retrofit Watcher
+-------------------------------------
+Reads the live data feeds behind https://gammill.com/preloved/ (two tabs of a
+published Google Sheet, each fetched as CSV: one for individual pre-loved
+machines, one for retrofit-package configurations) and:
+
+  1. Emails you a digest of any NEW active listings since the last check -
+     pre-loved or retrofit, any model, any size.
+  2. Logs every "Listed", "Sold", and "Removed" event, each with its own
+     timestamp, to listing_log.csv - open that file any time in Excel/Google
+     Sheets for a full history of what's come, been marked sold, and later
+     disappeared from the feed entirely.
+
+Designed to run on a schedule via GitHub Actions (see .github/workflows/watch.yml)
+so it works even when your computer is off.
+
+Configuration is read from environment variables (set as GitHub Secrets):
+    GMAIL_EMAIL          - the Gmail account used to send the alert
+    GMAIL_APP_PASSWORD   - Gmail app password (not your normal password)
+    NOTIFY_EMAIL         - where the alert should be sent (can be the same as GMAIL_EMAIL)
+"""
+
+import csv
+import io
+import json
+import os
+import smtplib
+from datetime import datetime, timezone
+from email.mime.text import MIMEText
+from pathlib import Path
+
+import requests
+
+# ---------------------------------------------------------------------------
+# CONFIG
+# ---------------------------------------------------------------------------
+
+CSV_URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    "1x0S6gnlnMGPq0uXl2JhxdLIr86DzjIYiBG8Asg3kJPM/gviz/tq?tqx=out:csv&gid=0"
+)
+# Discovered via the site's Network tab on 2026-09-26 - a second tab in the
+# same spreadsheet, holding retrofit-package listings (statuses include
+# "draft" for not-yet-available configurations, in addition to active/sold).
+RETROFIT_CSV_URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    "1x0S6gnlnMGPq0uXl2JhxdLIr86DzjIYiBG8Asg3kJPM/gviz/tq?tqx=out:csv&gid=2126555108"
+)
+
+GMAIL_EMAIL = os.environ["GMAIL_EMAIL"]
+GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
+NOTIFY_EMAIL = os.environ.get("NOTIFY_EMAIL", GMAIL_EMAIL)
+
+SEEN_FILE = Path(__file__).parent / "seen_listings.json"
+DAILY_FILE = Path(__file__).parent / "daily_summary.json"
+LOG_FILE = Path(__file__).parent / "listing_log.csv"
+
+LOG_HEADERS = [
+    "event", "date", "time", "type", "year", "model",
+    "throat_depth", "table_length", "price", "notes", "id",
+]
+
+# ---------------------------------------------------------------------------
+# Fetching
+# ---------------------------------------------------------------------------
+
+def fetch_csv(url, timeout=45, attempts=3):
+    """Pull one CSV feed, retrying on transient network errors."""
+    last_error = None
+    for attempt in range(1, attempts + 1):
+        try:
+            resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=timeout)
+            resp.raise_for_status()
+            return resp.text
+        except requests.exceptions.RequestException as e:
+            last_error = e
+            print(f"Attempt {attempt}/{attempts} failed: {e}")
+    raise last_error
+
+
+def fetch_listings():
+    """Pull both CSV feeds (pre-loved machines + retrofit packages) and
+    return a combined list of row dicts, keyed by column name."""
+    listings = []
+    for url in (CSV_URL, RETROFIT_CSV_URL):
+        text = fetch_csv(url)
+        reader = csv.DictReader(io.StringIO(text))
+        for row in reader:
+            if not row.get("id"):
+                continue
+            listings.append(row)
+    return listings
+
+
+def is_retrofit(listing):
+    retrofit_flag = (listing.get("retrofit") or "").strip().lower()
+    category = (listing.get("category") or "").strip().lower()
+    note = (listing.get("note") or "").strip().lower()
+    return retrofit_flag == "true" or "retrofit" in category or "retrofit" in note
+
+
+def snapshot(listing):
+    """The subset of fields worth remembering/logging for a listing."""
+    return {
+        "family": listing.get("family", "?"),
+        "year": listing.get("year", "?"),
+        "throat": listing.get("throat", "?"),
+        "table": listing.get("table", "?"),
+        "price": listing.get("price", "?"),
+        "note": listing.get("note") or listing.get("memo") or "",
+        "kind": "Retrofit" if is_retrofit(listing) else "Pre-Loved",
+    }
+
+
+# ---------------------------------------------------------------------------
+# State tracking (status per listing id, so we can detect Listed -> Sold -> Removed)
+# ---------------------------------------------------------------------------
+#
+# Each listing's status moves through: active -> sold -> removed (any step
+# can be skipped - e.g. a listing can vanish from the feed without ever
+# being marked "sold" first). Re-listing (removed/sold -> active again) is
+# also handled, logged as a fresh "Listed".
+
+def load_state():
+    if not SEEN_FILE.exists():
+        return {}
+    raw = json.loads(SEEN_FILE.read_text())
+    if isinstance(raw, list):
+        # Migrate from the very old flat-list format (pre-dates status tracking)
+        return {listing_id: {"status": "unknown", "listed_at": None,
+                              "sold_at": None, "removed_at": None} for listing_id in raw}
+    return raw
+
+
+def save_state(state):
+    SEEN_FILE.write_text(json.dumps(state, indent=2, sort_keys=True))
+
+
+def append_to_daily_summary(new_listings):
+    """Record today's new listings so the once-a-day summary email can report them."""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    entries = json.loads(DAILY_FILE.read_text()) if DAILY_FILE.exists() else []
+    for listing in new_listings:
+        entries.append({"date": today, **listing})
+    DAILY_FILE.write_text(json.dumps(entries, indent=2))
+
+
+def append_log_rows(rows):
+    file_exists = LOG_FILE.exists()
+    with LOG_FILE.open("a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=LOG_HEADERS)
+        if not file_exists:
+            writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
+def make_log_row(timestamp, event, listing_id, info):
+    date_part, time_part = timestamp.split(" ", 1)
+    throat = info.get("throat", "")
+    price = info.get("price", "")
+    return {
+        "event": event,
+        "date": date_part,
+        "time": time_part,
+        "type": info.get("kind", "?"),
+        "year": info.get("year", "?"),
+        "model": (info.get("family") or "?").title(),
+        "throat_depth": f'{throat}"' if throat else "",
+        "table_length": info.get("table", "?"),
+        "price": f"${price}" if price else "",
+        "notes": info.get("note", ""),
+        "id": listing_id,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Email
+# ---------------------------------------------------------------------------
+
+def format_listing(listing):
+    kind = "Retrofit" if is_retrofit(listing) else "Pre-Loved"
+    throat = listing.get("throat", "?")
+    return (
+        f"{kind}\n"
+        f"  Machine Year: {listing.get('year', '?')}\n"
+        f"  Machine Model: {listing.get('family', '').title()}\n"
+        f"  Throat Depth: {throat}\"\n"
+        f"  Table Length: {listing.get('table', '?')}\n"
+        f"  Price: ${listing.get('price', '?')}\n"
+        f"  ID: {listing.get('id', '?')}\n"
+        f"  Note: {listing.get('note') or listing.get('memo') or '(none)'}"
+    )
+
+
+def send_digest(new_listings):
+    # Pre-loved machines listed first, retrofit configurations after
+    ordered = sorted(new_listings, key=lambda l: is_retrofit(l))
+
+    subject = f"Gammill: {len(new_listings)} new listing(s)"
+    body = (
+        "New listing(s) found on the Gammill Pre-Loved / Retrofit feed:\n\n"
+        + "\n\n".join(format_listing(l) for l in ordered)
+        + "\n\nFull page: https://gammill.com/preloved/"
+    )
+
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = GMAIL_EMAIL
+    msg["To"] = NOTIFY_EMAIL
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()
+        server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
+        server.sendmail(GMAIL_EMAIL, [NOTIFY_EMAIL], msg.as_string())
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main():
+    listings = fetch_listings()
+
+    if not listings:
+        print("No rows found in the feed - check CSV_URL is still correct.")
+        return
+
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    state = load_state()
+    current_ids = set()
+    new_active_listings = []
+    log_rows = []
+
+    for listing in listings:
+        lid = listing["id"]
+        current_ids.add(lid)
+        status = (listing.get("status") or "").strip().lower()
+        info = snapshot(listing)
+
+        if lid not in state:
+            # Brand new id we've never tracked before
+            if status == "active":
+                new_active_listings.append(listing)
+                log_rows.append(make_log_row(now, "Listed", lid, info))
+                state[lid] = {"status": "active", "listed_at": now,
+                              "sold_at": None, "removed_at": None, **info}
+            elif status == "sold":
+                # Already sold the very first time we ever saw it - we have
+                # no idea when it was actually listed, so this is flagged
+                # distinctly rather than silently absorbed.
+                log_rows.append(make_log_row(
+                    now, "Sold (already sold when first tracked)", lid, info))
+                state[lid] = {"status": "sold", "listed_at": None,
+                              "sold_at": now, "removed_at": None, **info}
+            else:
+                state[lid] = {"status": status or "unknown", "listed_at": None,
+                              "sold_at": None, "removed_at": None, **info}
+            continue
+
+        old_status = state[lid].get("status")
+        if status != old_status:
+            if status == "sold" and old_status in ("active", "unknown"):
+                log_rows.append(make_log_row(now, "Sold", lid, info))
+                state[lid]["sold_at"] = now
+            elif status == "active" and old_status in ("sold", "removed", "unknown", "draft"):
+                # (Re-)listed
+                new_active_listings.append(listing)
+                log_rows.append(make_log_row(now, "Listed", lid, info))
+                state[lid]["listed_at"] = now
+                state[lid]["sold_at"] = None
+                state[lid]["removed_at"] = None
+        state[lid]["status"] = status or old_status
+        state[lid].update(info)
+
+    # Anything we were tracking as active or sold that's now vanished from
+    # the feed entirely gets its own distinct "Removed" event - separate
+    # from "Sold", since a listing can be pulled with or without ever being
+    # marked sold first, and the two dates are worth knowing separately.
+    for lid, info in state.items():
+        if info.get("status") in ("active", "sold") and lid not in current_ids:
+            log_rows.append(make_log_row(now, "Removed", lid, info))
+            info["status"] = "removed"
+            info["removed_at"] = now
+
+    if log_rows:
+        append_log_rows(log_rows)
+        print(f"Logged {len(log_rows)} event(s) to listing_log.csv")
+
+    if new_active_listings:
+        print(f"Found {len(new_active_listings)} new active listing(s). Sending email.")
+        send_digest(new_active_listings)
+        append_to_daily_summary(new_active_listings)
+    else:
+        print("No new active listings this run.")
+
+    save_state(state)
+
+
+if __name__ == "__main__":
+    main()
