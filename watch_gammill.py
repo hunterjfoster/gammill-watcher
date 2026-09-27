@@ -229,7 +229,7 @@ def main():
         print("No rows found in the feed - check CSV_URL is still correct.")
         return
 
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %I:%M %p UTC")
     state = load_state()
     current_ids = set()
     new_active_listings = []
