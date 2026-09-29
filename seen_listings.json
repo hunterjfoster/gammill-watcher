@@ -248,7 +248,7 @@
     "price": "9299",
     "removed_at": null,
     "sold_at": null,
-    "status": "active",
+    "status": "draft",
     "table": "10\u2032 (only) HomePro (HP2 Breeze)",
     "throat": "18",
     "year": "2018"
@@ -261,7 +261,7 @@
     "price": "8249",
     "removed_at": null,
     "sold_at": null,
-    "status": "active",
+    "status": "draft",
     "table": "10\u2032 (only) HomePro (HP2 Breeze)",
     "throat": "18",
     "year": "2015"
@@ -274,7 +274,7 @@
     "price": "9749",
     "removed_at": null,
     "sold_at": null,
-    "status": "active",
+    "status": "draft",
     "table": "10\u2032 (only) HomePro (HP2 Breeze)",
     "throat": "18",
     "year": "2019"
@@ -285,7 +285,7 @@
     "listed_at": "2026-08-20 21:28:43 UTC",
     "note": "",
     "price": "11999",
-    "status": "active",
+    "status": "draft",
     "table": "10\u2032 (only) HomePro (HP2 Breeze)",
     "throat": "18",
     "year": "2021"
