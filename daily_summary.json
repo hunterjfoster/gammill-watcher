@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "date": "2026-09-29",
+    "id": "2133M",
+    "family": "statler",
+    "throat": "30",
+    "year": "2012",
+    "price": "22499",
+    "claude's suggested price (flat $/yr)": "22499",
+    "claude's suggested price (curve)": "22499",
+    "monthly": "489",
+    "table": "12\u2032 Sit or Stand (ask about 14')",
+    "category": "",
+    "retrofit": "FALSE",
+    "savings": "29500",
+    "quilts": "3",
+    "region": "",
+    "memo": "Can be upgraded to Ascend prior to delivery for $7000",
+    "status": "active",
+    "note": "2012 retrofit on a 2003 machine (from machine list sheet).",
+    "image": "",
+    "NewPrice": "51999",
+    "YearsOld": "14",
+    "DiscountPerYr": "2107",
+    "pricing reasoning": "Rule (Andrew, confirmed): machine with a retrofit more than 5 years newer than the machine -> depreciate the RETROFIT only (Statler retrofit new 26999, age from retrofit year), apply the 50% floor to the retrofit value, then add 9000 for a 30in machine + table. Retrofit age 2026-2012 = 14. FLAT 1300 x 14 = 18,200 -> 8,799, below floor 13499 -> 13499. CURVE discount 14,977 -> 12,022, below floor -> 13499. Both: 13499 + 9000 = 22499.",
+    "pricing questions": "ANSWERED. For future machines of this kind I still need: the machine + table add-on for a 22in and a 26in (30in = 9000), and the retrofit new prices to depreciate for Vision (9999?) and Ascend (26999 + 6000?).",
+    "pricing answers from human": "Try depreciating the retrofit only (new $26,999 and age = 14) and then add $9000 for the 30\" machine and table.,  We'll see what that comes to.",
+    "": ""
+  }
+]
