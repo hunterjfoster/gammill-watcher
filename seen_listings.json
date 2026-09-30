@@ -321,7 +321,7 @@
     "kind": "Pre-Loved",
     "listed_at": null,
     "note": "Can be upgraded to Ascend prior to delivery for $7000",
-    "price": "37799",
+    "price": "36499",
     "removed_at": null,
     "sold_at": null,
     "status": "active",
@@ -439,7 +439,7 @@
     "kind": "Pre-Loved",
     "listed_at": null,
     "note": "Head only - needs new everything else (from machine list sheet).",
-    "price": "46699",
+    "price": "46499",
     "removed_at": null,
     "sold_at": null,
     "status": "active",
@@ -452,10 +452,10 @@
     "kind": "Pre-Loved",
     "listed_at": "2026-08-20 21:28:43 UTC",
     "note": "2019 Statler Retrofit on 2017 machine.   Can be upgraded to Ascend prior to delivery for $7000",
-    "price": "40749",
+    "price": "35499",
     "status": "active",
     "table": "12\u2032 Sit or Stand",
     "throat": "26",
-    "year": ""
+    "year": "2017"
   }
 }
