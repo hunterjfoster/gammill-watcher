@@ -453,7 +453,8 @@
     "listed_at": "2026-08-20 21:28:43 UTC",
     "note": "2019 Statler Retrofit on 2017 machine.   Can be upgraded to Ascend prior to delivery for $7000",
     "price": "35499",
-    "status": "active",
+    "sold_at": "10/10/2026 07:50 PM UTC",
+    "status": "sold",
     "table": "12\u2032 Sit or Stand",
     "throat": "26",
     "year": "2017"
