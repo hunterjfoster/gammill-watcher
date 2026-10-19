@@ -208,8 +208,8 @@
     "note": "2",
     "price": "40999",
     "removed_at": null,
-    "sold_at": null,
-    "status": "active",
+    "sold_at": "10/19/2026 08:50 PM UTC",
+    "status": "sold",
     "table": "12\u2032 Pivotal Access",
     "throat": "30",
     "year": "2001\u20132006"
@@ -222,7 +222,7 @@
     "price": "47999",
     "removed_at": null,
     "sold_at": null,
-    "status": "active",
+    "status": "draft",
     "table": "12\u2032 Sit or Stand",
     "throat": "30",
     "year": "2001\u20132006"
